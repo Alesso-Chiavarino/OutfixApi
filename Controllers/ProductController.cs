@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OutfixApi.Models;
 using OutfixApi.Repositories;
 
 namespace OutfixApi.Controllers
 {
     [Route("api/products")]
+    [Authorize]
     [ApiController]
     public class ProductController : Controller
     {
