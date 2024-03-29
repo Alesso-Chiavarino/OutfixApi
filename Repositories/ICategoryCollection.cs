@@ -4,10 +4,12 @@ namespace OutfixApi.Repositories
 {
     public interface ICategoryCollection
     {
-        Task<List<Category>> GetCategories();
+        Task InsertCategory(Category category);
+        Task UpdateCategory(Category category);
+        Task DeleteCategory(string id);
+
+        Task<List<Category>> GetAllCategories();
+
         Task<Category> GetCategoryById(string id);
-        Task<Category> CreateCategory(Category category);
-        Task<Category> UpdateCategory(Category category);
-        Task<Category> DeleteCategory(string id);
     }
 }

@@ -13,31 +13,33 @@ namespace OutfixApi.Repositories
         {
             Collection = _repository.db.GetCollection<Category>("Categories");
         }
-
-        public async Task<Category> CreateCategory(Category category)
+        public async Task DeleteCategory(string id)
         {
-            await Collection.InsertOneAsync(category);
-            return category;
+            var filter = Builders<Category>.Filter.Eq(s => s.Id, id);
+            await Collection.DeleteOneAsync(filter);
         }
 
-        public async Task<Category> DeleteCategory(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<List<Category>> GetCategories()
+        public async Task<List<Category>> GetAllCategories()
         {
             return await Collection.FindAsync(new BsonDocument()).Result.ToListAsync();
         }
 
         public async Task<Category> GetCategoryById(string id)
         {
-            throw new NotImplementedException();
+            var filter = Builders<Category>.Filter.Eq(p => p.Id, id);
+            var category = await Collection.Find(filter).FirstOrDefaultAsync();
+            return category;
         }
 
-        public async Task<Category> UpdateCategory(Category category)
+        public async Task InsertCategory(Category category)
         {
-            throw new NotImplementedException();
+            await Collection.InsertOneAsync(category);
+        }
+
+        public async Task UpdateCategory(Category category)
+        {
+            var filter = Builders<Category>.Filter.Eq(s => s.Id, category.Id);
+            await Collection.ReplaceOneAsync(filter, category);
         }
     }
 }
