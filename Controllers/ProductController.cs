@@ -4,7 +4,7 @@ using OutfixApi.Repositories;
 
 namespace OutfixApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/products")]
     [ApiController]
     public class ProductController : Controller
     {
@@ -30,7 +30,7 @@ namespace OutfixApi.Controllers
                 return BadRequest();
             }
 
-            if(product.Name == string.Empty)
+            if(product.Title == string.Empty)
             {
                 ModelState.AddModelError("Name", "The product Name is empty");
             }
@@ -48,7 +48,7 @@ namespace OutfixApi.Controllers
                 return BadRequest();
             }
 
-            if (product.Name == string.Empty)
+            if (product.Title == string.Empty)
             {
                 ModelState.AddModelError("Name", "The product Name is empty");
             }
