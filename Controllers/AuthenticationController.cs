@@ -21,7 +21,7 @@ namespace OutfixApi.Controllers
         }
 
         [HttpPost]
-        [Route("validate")]
+        [Route("login")]
 
         public async Task<IActionResult> Login([FromBody] Login userLogin) {
 
@@ -34,12 +34,13 @@ namespace OutfixApi.Controllers
                 var keyBytes = Encoding.ASCII.GetBytes(_secretKey);
                 var claims = new ClaimsIdentity();
 
-                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, userLogin.Email));
+                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, userFounded.Id));
+                claims.AddClaim(new Claim(ClaimTypes.Email, userFounded.Email));
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = claims,
-                    Expires = DateTime.UtcNow.AddMinutes(5),
+                    Expires = DateTime.UtcNow.AddMonths(1),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
                 };
 
