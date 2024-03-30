@@ -19,6 +19,14 @@ namespace OutfixApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetUserDetails(string id)
         {
+            var userFounded = await db.GetUserById(id);
+
+            if (userFounded == null)
+            {
+                ModelState.AddModelError("message", "User not found");
+                return StatusCode(StatusCodes.Status404NotFound, ModelState);
+            }
+
             return Ok(await db.GetUserById(id));
         }
 
@@ -30,14 +38,38 @@ namespace OutfixApi.Controllers
                 return BadRequest();
             }
 
-            if (user.Name == string.Empty)
+            if (string.IsNullOrEmpty(user.Name))
             {
-                ModelState.AddModelError("Name", "The user Name is empty");
+                ModelState.AddModelError("message", "The user Name is empty");
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                ModelState.AddModelError("message", "The user Email is empty");
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(user.Password))
+            {
+                ModelState.AddModelError("message", "The user Password is empty");
+                return BadRequest(ModelState);
+            }
+
+            var userFounded = await db.GetUserByEmail(user.Email);
+
+            if(userFounded != null)
+            {
+                if (userFounded.Email == user.Email)
+                {
+                    ModelState.AddModelError("message", $"The user with {user.Email} already exists");
+                    return BadRequest(ModelState);
+                }
             }
 
             await db.CreateUser(user);
 
-            return Created("Created", true);
+            return Created("User created successfully", true);
         }
 
         [HttpPut("{id}")]
@@ -45,23 +77,59 @@ namespace OutfixApi.Controllers
         {
             if (user == null)
             {
-                return BadRequest();
+                ModelState.AddModelError("message", "The user can´t be null");
+                return BadRequest(ModelState);
             }
 
-            if (user.Name == string.Empty)
+            if (string.IsNullOrEmpty(user.Name))
             {
-                ModelState.AddModelError("Name", "The product Name is empty");
+                ModelState.AddModelError("message", "The user Name is empty");
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                ModelState.AddModelError("message", "The user Email is empty");
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(user.Password))
+            {
+                ModelState.AddModelError("message", "The user Password is empty");
+                return BadRequest(ModelState);
+            }
+
+            if(string.IsNullOrEmpty(id))
+            {
+                ModelState.AddModelError("message", "Id was not provided");
+                return BadRequest(ModelState);
+            }
+
+            var userFounded = await db.GetUserById(id);
+
+            if (userFounded == null)
+            {
+                ModelState.AddModelError("message", "User not found");
+                return StatusCode(StatusCodes.Status404NotFound, ModelState);
             }
 
             user.Id = id;
             await db.UpdateUser(user);
 
-            return Created("Created", true);
+            return Created("User updated successfully", true);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(string id)
         {
+
+            var userFounded = await db.GetUserById(id);
+
+            if (userFounded == null)
+            {
+                ModelState.AddModelError("message", "User not found");
+                return StatusCode(StatusCodes.Status404NotFound, ModelState);
+            }
 
             await db.DeleteUser(id);
 
