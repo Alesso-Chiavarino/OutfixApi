@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OutfixApi.Models;
 using OutfixApi.Repositories;
+using System.Data;
 
 namespace OutfixApi.Controllers
 {
@@ -53,6 +54,18 @@ namespace OutfixApi.Controllers
             if (string.IsNullOrEmpty(user.Password))
             {
                 ModelState.AddModelError("message", "The user Password is empty");
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(user.Role))
+            {
+                ModelState.AddModelError("message", "The user Role is empty");
+                return BadRequest(ModelState);
+            }
+
+            if (user.Role != "admin" && user.Role != "customer" && user.Role != "seller") 
+            {
+                ModelState.AddModelError("message", "User role can be admin or customer or seller");
                 return BadRequest(ModelState);
             }
 

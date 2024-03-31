@@ -36,6 +36,7 @@ namespace OutfixApi.Controllers
 
                 claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, userFounded.Id));
                 claims.AddClaim(new Claim(ClaimTypes.Email, userFounded.Email));
+                claims.AddClaim(new Claim(ClaimTypes.Role, userFounded.Role));
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
