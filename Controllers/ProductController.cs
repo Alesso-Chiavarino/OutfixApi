@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OutfixApi.Models;
 using OutfixApi.Repositories;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace OutfixApi.Controllers
 {
@@ -32,9 +33,16 @@ namespace OutfixApi.Controllers
                 return BadRequest();
             }
 
-            if(product.Title == string.Empty)
+            if (string.IsNullOrEmpty(product.Title))
             {
-                ModelState.AddModelError("Name", "The product Name is empty");
+                ModelState.AddModelError("message", "The product Title is empty");
+                return BadRequest(ModelState);
+            }
+
+            if (product.Images.Length == 0)
+            {
+                ModelState.AddModelError("message", "The product Images are empty");
+                return BadRequest(ModelState);
             }
 
             await db.InsertProduct(product);
