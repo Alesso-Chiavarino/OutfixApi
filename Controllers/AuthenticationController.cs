@@ -17,7 +17,7 @@ namespace OutfixApi.Controllers
 
         public AuthenticationController(IConfiguration config)
         {
-            _secretKey = config.GetSection("settings").GetSection("secretKet").ToString();
+            _secretKey = config.GetSection("settings").GetSection("secretKey").ToString();
         }
 
         [HttpPost]

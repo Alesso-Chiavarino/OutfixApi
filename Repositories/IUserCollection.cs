@@ -10,5 +10,6 @@ namespace OutfixApi.Repositories
         Task<List<User>> GetAllUsers();
         Task UpdateUser(User user);
         Task<User> GetUserByEmail(string email);
+        Task<User> GetUserByName(string name);
     }
 }

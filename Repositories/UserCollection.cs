@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System.Text.RegularExpressions;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using OutfixApi.Models;
 
@@ -31,6 +32,13 @@ namespace OutfixApi.Repositories
         public async Task<User> GetUserById(string id)
         {
             var filter = Builders<User>.Filter.Eq(p => p.Id, id);
+            var user = await Collection.Find(filter).FirstOrDefaultAsync();
+            return user;
+        }
+
+        public async Task<User> GetUserByName(string name)
+        {
+            var filter = Builders<User>.Filter.Regex(x => x.Name, new BsonRegularExpression(new Regex(name, RegexOptions.IgnoreCase)));
             var user = await Collection.Find(filter).FirstOrDefaultAsync();
             return user;
         }

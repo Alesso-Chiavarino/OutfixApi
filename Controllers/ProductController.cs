@@ -7,7 +7,6 @@ using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext
 namespace OutfixApi.Controllers
 {
     [Route("api/products")]
-    [Authorize]
     [ApiController]
     public class ProductController : Controller
     {
@@ -25,6 +24,7 @@ namespace OutfixApi.Controllers
             return Ok(await db.GetProductById(id));
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> CreateProduct([FromBody] Product product)
         {
@@ -50,6 +50,7 @@ namespace OutfixApi.Controllers
             return Created("Created", true);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateProduct([FromBody] Product product, string id)
         {
@@ -69,6 +70,7 @@ namespace OutfixApi.Controllers
             return Created("Created", true);
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduc(string id) {
         

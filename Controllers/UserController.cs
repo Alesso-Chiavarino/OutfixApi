@@ -28,7 +28,21 @@ namespace OutfixApi.Controllers
                 return StatusCode(StatusCodes.Status404NotFound, ModelState);
             }
 
-            return Ok(await db.GetUserById(id));
+            return Ok(userFounded);
+        }
+
+        [HttpGet("/api/users/name/{name}")]
+        public async Task<ActionResult> GetUserByName(string name)
+        {
+            var userFounded = await db.GetUserByName(name);
+
+            if(userFounded == null)
+            {
+                ModelState.AddModelError("message", "User not found");
+                return StatusCode(StatusCodes.Status404NotFound, ModelState);
+            }
+
+            return Ok(userFounded);
         }
 
         [HttpPost]
