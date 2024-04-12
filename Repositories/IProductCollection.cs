@@ -8,7 +8,7 @@ namespace OutfixApi.Repositories
         Task UpdateProduct(Product product);
         Task DeleteProduct(string id);
 
-        Task<List<Product>> GetAllProducts();
+        Task<List<Product>> GetAllProducts(int? limit, string? category, int page = 1);
 
         Task<Product> GetProductById(string id);
     }

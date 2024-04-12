@@ -11,24 +11,36 @@ namespace OutfixApi.Controllers
     public class ProductController : Controller
     {
         private IProductCollection db = new ProductCollection();
+        private IUserCollection userCollection = new UserCollection();
 
         [HttpGet]
-        public async Task<ActionResult> GetAllProducts() 
+        public async Task<ActionResult> GetAllProducts(
+            [FromQuery] int limit,
+            [FromQuery] string? category,
+            [FromQuery] int page = 1
+            )
         {
-            return Ok(await db.GetAllProducts());
+            var products = await db.GetAllProducts(limit > 0 ? limit : 20, category, page);
+            var response = new
+            {
+                products,
+                page
+            };
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult> GetProducDetails(string id)
         {
-            return Ok(await db.GetProductById(id));
+            var product = await db.GetProductById(id);
+            return Ok(product);
         }
 
         [Authorize]
         [HttpPost]
         public async Task<ActionResult> CreateProduct([FromBody] Product product)
         {
-            if(product == null)
+            if (product == null)
             {
                 return BadRequest();
             }
@@ -43,6 +55,26 @@ namespace OutfixApi.Controllers
             {
                 ModelState.AddModelError("message", "The product Images are empty");
                 return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(product.Owner))
+            {
+                ModelState.AddModelError("message", "The product Owner is empty");
+                return BadRequest(ModelState);
+            }
+
+            var user = await userCollection.GetUserByEmail(product.Owner);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("message", $"The user {product.Owner} not exists");
+                return NotFound(ModelState);
+            }
+
+            if (user.Role != "admin" && user.Role != "seller")
+            {
+                ModelState.AddModelError("message", $"The user {product.Owner} must be a seller to create products.");
+                return Unauthorized(ModelState);
             }
 
             await db.InsertProduct(product);
@@ -72,8 +104,9 @@ namespace OutfixApi.Controllers
 
         [Authorize]
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteProduc(string id) {
-        
+        public async Task<ActionResult> DeleteProduc(string id)
+        {
+
             await db.DeleteProduct(id);
 
             return NoContent();

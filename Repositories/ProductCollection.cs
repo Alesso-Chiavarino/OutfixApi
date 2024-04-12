@@ -19,9 +19,23 @@ namespace OutfixApi.Repositories
             await Collection.DeleteOneAsync(filter);
         }
 
-        public async Task<List<Product>> GetAllProducts()
+        public async Task<List<Product>> GetAllProducts(int? limit, string? category, int page = 1)
         {
-           return await Collection.FindAsync(new BsonDocument()).Result.ToListAsync();
+
+            if(!string.IsNullOrEmpty(category))
+            {
+                var filter = Builders<Product>.Filter.Eq(p => p.Category, category);
+
+                return await Collection.Find(filter)
+                    .Limit(limit > 0 ? limit : 20)
+                    .Skip((page - 1) * limit)
+                    .ToListAsync();
+            }
+
+            return await Collection.Find(new BsonDocument())
+                 .Limit(limit)
+                 .Skip((page - 1) * limit)
+                 .ToListAsync();
         }
 
         public async Task<Product> GetProductById(string id)

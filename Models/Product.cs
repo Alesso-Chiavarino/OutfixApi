@@ -11,6 +11,7 @@ namespace OutfixApi.Models
         public string Title { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
+        public string Owner { get; set; }
         public string[] Images {  get; set; }
         public int Stock { get; set; }
         public double Price { get; set; }
