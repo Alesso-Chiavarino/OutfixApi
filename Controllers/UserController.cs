@@ -36,7 +36,7 @@ namespace OutfixApi.Controllers
         {
             var userFounded = await db.GetUserByName(name);
 
-            if(userFounded == null)
+            if (userFounded == null)
             {
                 ModelState.AddModelError("message", "User not found");
                 return StatusCode(StatusCodes.Status404NotFound, ModelState);
@@ -77,7 +77,7 @@ namespace OutfixApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (user.Role != "admin" && user.Role != "customer" && user.Role != "seller") 
+            if (user.Role != "admin" && user.Role != "customer" && user.Role != "seller")
             {
                 ModelState.AddModelError("message", "User role can be admin or customer or seller");
                 return BadRequest(ModelState);
@@ -85,7 +85,7 @@ namespace OutfixApi.Controllers
 
             var userFounded = await db.GetUserByEmail(user.Email);
 
-            if(userFounded != null)
+            if (userFounded != null)
             {
                 if (userFounded.Email == user.Email)
                 {
@@ -100,56 +100,38 @@ namespace OutfixApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateUser([FromBody] User user, string id)
+        [HttpPut]
+        public async Task<ActionResult> UpdateUser([FromBody] UpdateUserDto request, string id)
         {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest("Id was not provided");
+
+            var user = await db.GetUserById(id);
+
             if (user == null)
-            {
-                ModelState.AddModelError("message", "The user can´t be null");
-                return BadRequest(ModelState);
-            }
+                return NotFound("User not found");
 
-            if (string.IsNullOrEmpty(user.Name))
-            {
-                ModelState.AddModelError("message", "The user Name is empty");
-                return BadRequest(ModelState);
-            }
+            // Solo actualiza lo que venga (PARCHADO)
+            if (!string.IsNullOrEmpty(request.Name))
+                user.Name = request.Name;
 
-            if (string.IsNullOrEmpty(user.Email))
-            {
-                ModelState.AddModelError("message", "The user Email is empty");
-                return BadRequest(ModelState);
-            }
+            if (!string.IsNullOrEmpty(request.Email))
+                user.Email = request.Email;
 
-            if (string.IsNullOrEmpty(user.Password))
-            {
-                ModelState.AddModelError("message", "The user Password is empty");
-                return BadRequest(ModelState);
-            }
+            if (!string.IsNullOrEmpty(request.Password))
+                user.Password = request.Password;
 
-            if(string.IsNullOrEmpty(id))
-            {
-                ModelState.AddModelError("message", "Id was not provided");
-                return BadRequest(ModelState);
-            }
+            if (!string.IsNullOrEmpty(request.Role))
+                user.Role = request.Role;
 
-            var userFounded = await db.GetUserById(id);
-
-            if (userFounded == null)
-            {
-                ModelState.AddModelError("message", "User not found");
-                return StatusCode(StatusCodes.Status404NotFound, ModelState);
-            }
-
-            user.Id = id;
             await db.UpdateUser(user);
 
-            return Created("User updated successfully", true);
+            return Ok(new { message = "User updated successfully" });
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(string id)
         {
-
             var userFounded = await db.GetUserById(id);
 
             if (userFounded == null)
@@ -162,6 +144,5 @@ namespace OutfixApi.Controllers
 
             return NoContent();
         }
-
     }
 }

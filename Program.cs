@@ -9,6 +9,16 @@ builder.Configuration.AddJsonFile("appsettings.json");
 var secretKey = builder.Configuration.GetSection("settings").GetSection("secretKey").ToString();
 var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -56,6 +66,8 @@ builder.Services.AddAuthentication(config =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 if (!app.Environment.IsDevelopment())
 {
