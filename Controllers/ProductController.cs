@@ -12,13 +12,15 @@ namespace OutfixApi.Controllers
     {
         private IProductCollection db = new ProductCollection();
         private IUserCollection userCollection = new UserCollection();
+        private IColorCollection colorCollection = new ColorCollection();
+        private ICategoryCollection categoryCollection = new CategoryCollection();
 
         [HttpGet]
         public async Task<ActionResult> GetAllProducts(
             [FromQuery] int limit,
             [FromQuery] string? category,
             [FromQuery] int page = 1
-            )
+        )
         {
             var products = await db.GetAllProducts(limit > 0 ? limit : 20, category, page);
             var response = new
@@ -29,11 +31,58 @@ namespace OutfixApi.Controllers
             return Ok(response);
         }
 
+        [Authorize]
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUserProducts(
+            [FromQuery] string owner,
+            [FromQuery] int? limit,
+            [FromQuery] string? category,
+            [FromQuery] int page = 1
+        )
+        {
+
+            if (string.IsNullOrEmpty(owner))
+                return Unauthorized("missing email");
+
+            var products = await db.GetUserProducts(owner, limit, category, page);
+
+            return Ok(new { products, page });
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetProducDetails(string id)
+        public async Task<ActionResult> GetProductDetails(string id)
         {
             var product = await db.GetProductById(id);
-            return Ok(product);
+
+            if (product == null)
+                return NotFound();
+
+            var category = await categoryCollection.GetCategoryById(product.Category);
+
+            var colorIds = product.Variants
+                .Select(v => v.Color)
+                .Distinct()
+                .ToList();
+
+            var colors = await Task.WhenAll(
+                colorIds.Select(colorId => colorCollection.GetColorById(colorId))
+            );
+            
+            var productDetails = new
+            {
+                product.Id,
+                product.Title,
+                product.Description,
+                product.Price,
+                product.Images,
+                product.Target,
+                product.Draft,
+                Category = category,
+                Variants = product.Variants,
+                Colors = colors
+            };
+            
+            return Ok(productDetails);
         }
 
         [Authorize]
@@ -106,7 +155,6 @@ namespace OutfixApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduc(string id)
         {
-
             await db.DeleteProduct(id);
 
             return NoContent();
