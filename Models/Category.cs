@@ -20,5 +20,6 @@ namespace OutfixApi.Models
         public bool Active { get; set; } = true;
 
         public string? ParentId { get; set; }  
+        public string? Banner { get; set; }  
     }
 }

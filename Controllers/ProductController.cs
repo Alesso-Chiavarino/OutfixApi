@@ -19,16 +19,18 @@ namespace OutfixApi.Controllers
         public async Task<ActionResult> GetAllProducts(
             [FromQuery] int limit,
             [FromQuery] string? category,
+            [FromQuery] string? search,
             [FromQuery] int page = 1
         )
         {
-            var products = await db.GetAllProducts(limit > 0 ? limit : 20, category, page);
-            var response = new
-            {
-                products,
+            var products = await db.GetAllProducts(
+                limit > 0 ? limit : 20,
+                category,
+                search,
                 page
-            };
-            return Ok(response);
+            );
+
+            return Ok(new { products, page });
         }
 
         [Authorize]

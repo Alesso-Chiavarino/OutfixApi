@@ -21,21 +21,37 @@ namespace OutfixApi.Repositories
             await Collection.DeleteOneAsync(filter);
         }
 
-        public async Task<List<Product>> GetAllProducts(int? limit, string? category, int page = 1)
+        public async Task<List<Product>> GetAllProducts(
+            int? limit,
+            string? category,
+            string? search,
+            int page = 1
+        )
         {
+            var filters = new List<FilterDefinition<Product>>();
+
             if (!string.IsNullOrEmpty(category))
             {
-                var filter = Builders<Product>.Filter.Eq(p => p.Category, category);
-
-                return await Collection.Find(filter)
-                    .Limit(limit > 0 ? limit : 20)
-                    .Skip((page - 1) * limit)
-                    .ToListAsync();
+                filters.Add(Builders<Product>.Filter.Eq(p => p.Category, category));
             }
 
-            return await Collection.Find(new BsonDocument())
-                .Limit(limit)
-                .Skip((page - 1) * limit)
+            if (!string.IsNullOrEmpty(search))
+            {
+                filters.Add(
+                    Builders<Product>.Filter.Regex(
+                        p => p.Title,
+                        new BsonRegularExpression(search, "i")
+                    )
+                );
+            }
+
+            var filter = filters.Count > 0
+                ? Builders<Product>.Filter.And(filters)
+                : new BsonDocument();
+
+            return await Collection.Find(filter)
+                .Limit(limit > 0 ? limit : 20)
+                .Skip((page - 1) * (limit ?? 20))
                 .ToListAsync();
         }
 
