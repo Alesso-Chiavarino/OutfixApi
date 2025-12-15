@@ -105,9 +105,9 @@ public class CheckoutController : ControllerBase
             ExternalReference = order.Id, // 🔗 clave para webhook
             BackUrls = new PreferenceBackUrlsRequest
             {
-                Success = "https://outfix.com/checkout/success",
-                Failure = "https://outfix.com/checkout/failure",
-                Pending = "https://outfix.com/checkout/pending"
+                Success = "https://outfix.vercel.app/checkout/success",
+                Failure = "https://outfix.vercel.app/checkout/failure",
+                Pending = "https://outfix.vercel.app/checkout/pending"
             },
             AutoReturn = "approved"
         };
