@@ -12,5 +12,7 @@ namespace OutfixApi.Repositories
         Task<List<Product>> GetUserProducts(string owner, int? limit, string? category, int page = 1);
 
         Task<Product> GetProductById(string id);
+
+        public Task DecreaseStock(string productId, string variantId, int quantity);
     }
 }
